@@ -1,35 +1,58 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { MessageCard } from './components/MessageCard'
+import * as React from "react";
+
+type Message = {
+    role: 'assistant' | 'user';
+    content: string;
+};
+
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [message, setMessage] = useState<Message[]>([
+        {
+            role: 'assistant',
+            content: 'Hello, how can I help you today?'
+        },
+    ])
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    const [input, setInput] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (input.trim()) {
+            const newMessage: Message = { role: 'user', content: input };
+            setMessage((prevMessages) => [...prevMessages, newMessage]);
+
+            setInput('');
+        }
+    }
+
+    return (
+      <div className={'flex flex-col h-screen bg-gray-100 py-20'}>
+          <main className={'flex-grow overflow-hidden'}>
+              <div className={'max-w-3xl mx-auto h-full flex flex-col'}>
+                  <div className={'flex-grow overflow-y-auto p-4 my-4 flex flex-col'}>
+                      {message.map((message => (
+                          <MessageCard role={message.role} message={message.content} />
+                      )))}
+                  </div>
+
+                  <form onSubmit={handleSubmit} className={'flex items-center p-4'}>
+                      <textarea
+                        placeholder={'Type your message...'}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        className={'flex-grow mr-2 p-4 border rounded-2xl border-gray-300'}
+                      />
+                      <button type="submit" disabled={!input.trim()} className={'p-4 bg-blue-500 rounded-2xl text-white'}>
+                          Send
+                      </button>
+                  </form>
+              </div>
+          </main>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    )
 }
 
 export default App
