@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MessageCard } from './components/MessageCard'
 import * as React from "react";
+import ollama from 'ollama';
 
 type Message = {
     role: 'assistant' | 'user';
@@ -23,6 +24,21 @@ function App() {
         if (input.trim()) {
             const newMessage: Message = { role: 'user', content: input };
             setMessage((prevMessages) => [...prevMessages, newMessage]);
+
+            // function
+            const {message} = await ollama.chat({
+                model: 'deepseek-r1:1.5b',
+                messages: [newMessage],
+                // [
+                    // {
+                    //     role: 'user',
+                    //     content: input
+                    // }
+                // ]
+                stream: false
+            })
+
+            setMessage(prevMessages => [...prevMessages, { role: 'assistant', content: message.content }]);
 
             setInput('');
         }
